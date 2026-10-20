@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Movie Stats | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a> &rsaquo; Movie Stats
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+    <div class="module">
+        <h2>Most bought movie</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Movie</th>
+                    <th>Times bought</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if most_bought %}
+                <tr>
+                    <td>
+                        <a href="{% url 'movies.show' id=most_bought.movie_id %}">{{ most_bought.movie__name }}</a>
+                    </td>
+                    <td>{{ most_bought.total }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2">No movie has been bought yet.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="module">
+        <h2>Most reviewed movie</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Movie</th>
+                    <th>Times reviewed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if most_reviewed %}
+                <tr>
+                    <td>
+                        <a href="{% url 'movies.show' id=most_reviewed.movie_id %}">{{ most_reviewed.movie__name }}</a>
+                    </td>
+                    <td>{{ most_reviewed.total }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2">No movie has been reviewed yet.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
