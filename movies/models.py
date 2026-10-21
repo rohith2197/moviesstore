@@ -21,3 +21,19 @@ class Review(models.Model):
 
     def __str__(self):
         return str(self.id) + ' - ' + self.movie.name
+
+class Rating(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    score = models.PositiveSmallIntegerField(
+        choices=[(i, str(i)) for i in range(1,6)]
+
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+            fields=["movie", "user"],
+            name = "one_rating_per_user_per_movie",
+            ),
+        ]

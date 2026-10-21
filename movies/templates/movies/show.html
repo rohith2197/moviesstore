@@ -9,7 +9,7 @@
         <hr />
         <p><b>Description:</b> {{ template_data.movie.description }}</p>
         <p><b>Price:</b> ${{ template_data.movie.price }}</p>
-        <p class="card-text">
+        <div class="card-text">
           <form method="post" action="{% url 'cart.add' id=template_data.movie.id %}">
             <div class="row">
               {% csrf_token %}
@@ -24,7 +24,46 @@
               </div>
             </div>
           </form>
-        </p>
+        </div>
+
+        <h2>Ratings</h2>
+        <hr />
+
+        {% if template_data.average_rating %}
+          <p>
+            Average rating:
+            {{ template_data.average_rating|floatformat:1 }} / 5
+          </p>
+        {% else %}
+          <p> No ratings yet. </p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          {% if template_data.user_rating %}
+            <p> Your rating : {{ template_data.user_rating.score }} / 5</p>
+
+          {% endif %}
+
+          <form method = "POST"
+                action="{% url 'movies.rate_movie' id=template_data.movie.id %}">
+              {% csrf_token %}
+              <label for="score">Your rating:</label>
+              <select name = "score" id = "score" class = "form-select" required>
+                {% for score in template_data.rating_options %}
+                  <option value = "{{score}}"
+                    {% if template_data.user_rating.score == score %}selected{% endif %}>
+                    {{ score }} / 5
+              </option>
+            {% endfor %}
+          </select>
+
+          <button type="submit" class ="btn bg-dark text-white mt-2 mb-3">
+            Save rating
+          </button>
+        </form>
+      {% else %}
+        <p>Log in to rate this movie. </p>
+      {% endif %}
 
         <h2>Reviews</h2>
         <hr />
