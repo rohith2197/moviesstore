@@ -4,6 +4,7 @@ from movies.models import Movie
 from .utils import calculate_cart_total
 from .models import Order, Item
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Sum
 
 def index(request):
     cart_total = 0
@@ -33,6 +34,8 @@ def clear(request):
 
 @login_required
 def purchase(request):
+    if request.method != 'POST':
+        return redirect('cart.index')
     cart = request.session.get('cart', {})
     movie_ids = list(cart.keys())
     if (movie_ids == []):
@@ -42,6 +45,8 @@ def purchase(request):
     order = Order()
     order.user = request.user
     order.total = cart_total
+    if request.POST['lat'] != '' and request.POST['lng'] != '':
+        order.region_id = str(int(float(request.POST['lat']))) + ',' + str(int(float(request.POST['lng'])))
     order.save()
     for movie in movies_in_cart:
         item = Item()
@@ -56,3 +61,39 @@ def purchase(request):
     template_data['order_id'] = order.id
     return render(request, 'cart/purchase.html',
         {'template_data': template_data})
+
+def trending_map(request):
+    # movies sold per region, most first
+    regions = list(Item.objects.exclude(order__region_id='')
+        .values('order__region_id')
+        .annotate(count=Sum('quantity'))
+        .order_by('-count'))
+
+    # best-selling movie inside each region
+    for r in regions:
+        top = (Item.objects.filter(order__region_id=r['order__region_id'])
+            .values('movie__name')
+            .annotate(count=Sum('quantity'))
+            .order_by('-count')
+            .first())
+        r['region_id'] = r.pop('order__region_id')
+        r['top_movie'] = top['movie__name'] if top else ''
+        r['top_movie_count'] = top['count'] if top else 0
+
+    template_data = {}
+    template_data['title'] = 'Local Popularity Map'
+    template_data['regions'] = regions
+    return render(request, 'cart/trending.html', {'template_data': template_data})
+
+def region_top_movies(request, region_id):
+    # best-selling movies inside one region
+    movies = (Item.objects.filter(order__region_id=region_id)
+        .values('movie__id', 'movie__name', 'movie__image')
+        .annotate(count=Sum('quantity'))
+        .order_by('-count')[:5])
+
+    template_data = {}
+    template_data['title'] = 'Top Movies'
+    template_data['region_id'] = region_id
+    template_data['movies'] = movies
+    return render(request, 'cart/region.html', {'template_data': template_data})
