@@ -27,6 +27,7 @@
             <a class="nav-link" href="{% url 'home.about' %}">About</a>
             <a class="nav-link" href="{% url 'movies.index' %}">Movies</a>
             <a class="nav-link" href="{% url 'cart.index' %}">Cart</a>
+            <a class="nav-link" href="{% url 'cart.trending' %}">Local Popularity Map</a>
             <div class="vr bg-white mx-2 d-none d-lg-block"></div>
             {% if user.is_staff %}
             <a class = "nav-link" href = "{%url 'admin:index'%}">Admin</a>
@@ -56,8 +57,8 @@
           <div class="col-md-6 col-lg-6 col-xl-6 mx-auto mb-4">
             <b>MOVIES STORE</b>
             <hr />
-            <p>Welcome to Movies Store, your premier online destination for a cinematic 
-              adventure like no other! Dive into the world of movies from the comfort of your own home with our user-friendly 
+            <p>Welcome to Movies Store, your premier online destination for a cinematic
+              adventure like no other! Dive into the world of movies from the comfort of your own home with our user-friendly
               and immersive online movie store.</p>
           </div>
           <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mb-4">
@@ -78,7 +79,7 @@
     <section class="p-3 ms-footer-bottom bg-dark">
       <div class="container d-flex justify-content-between">
         <div class="me-5 text-white">
-          <span>DESIGNED BY <a href="https://www.x.com/danielgarax" target="_blank">DANIEL CORREA</a> & 
+          <span>DESIGNED BY <a href="https://www.x.com/danielgarax" target="_blank">DANIEL CORREA</a> &
             <a href="https://www.x.com/greglim81" target="_blank">GREG LIM</a>
           </span>
         </div>

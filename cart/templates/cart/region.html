@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3 text-center">
+        <h2>Top movies in region {{ template_data.region_id }}</h2>
+        <hr />
+      </div>
+    </div>
+    <div class="row m-1 justify-content-center">
+      <div class="col-lg-8">
+      <table class="table table-bordered table-striped text-center align-middle">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Movie</th>
+            <th scope="col">Copies sold</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in template_data.movies %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <a href="{% url 'movies.show' m.movie__id %}" class="text-decoration-none">
+                <img src="/media/{{ m.movie__image }}" alt="" style="height:60px; width:40px; object-fit:cover" class="me-2 rounded">
+                {{ m.movie__name }}
+              </a>
+            </td>
+            <td><span class="badge bg-dark fs-6">{{ m.count }}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted">No orders in this region yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <div class="text-center">
+      <a href="{% url 'cart.trending' %}" class="btn btn-outline-secondary">&larr; Back to map</a>
+    </div>
+  </div>
+</div>
+{% endblock content %}

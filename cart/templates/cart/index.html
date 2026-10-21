@@ -36,9 +36,26 @@
       <div class="text-end">
         <a class="btn btn-outline-secondary mb-2"><b>Total to pay:</b> ${{ template_data.cart_total }}</a>
         {% if template_data.movies_in_cart|length > 0 %}
-        <a href="{% url 'cart.purchase' %}"
-            class="btn bg-dark text-white mb-2">Purchase
-        </a>
+        <form method="POST" action = "{% url 'cart.purchase' %}" id="purchase_form" style="display:inline">
+            {% csrf_token %}
+            <input type="hidden" name="lat" id="lat" value="">
+            <input type="hidden" name="lng" id="lng" value="">
+            <button type="button" class="btn bg-dark text-white mb-2" onclick="purchaseWithLocation()">Purchase</button>
+        </form>
+        <script>
+        function purchaseWithLocation() {
+          const form = document.getElementById('purchase_form');
+          if (!navigator.geolocation) { form.submit(); return; }
+          navigator.geolocation.getCurrentPosition(
+            function(pos) {
+              document.getElementById('lat').value = pos.coords.latitude;
+              document.getElementById('lng').value = pos.coords.longitude;
+              form.submit();
+            },
+            function() { form.submit(); }
+          );
+        }
+        </script>
         <a href="{% url 'cart.clear' %}">
           <button class="btn btn-danger mb-2">
             Remove all movies from Cart
