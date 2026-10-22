@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class = "breadcrumbs">
+	<a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+	{{ title }}
+	</dov>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+	<table style="width: 100%;">
+		<thead>
+			<tr>
+				<th>Username</th>
+				<th>Movies Purchased</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if top_user %}
+			<tr>
+				<td> {{ top_user.username }}</td>
+				<td> {{ top_user.purchase_count }}</td>
+			</tr>
+			{% else %}
+			<tr><td colspan="2">No purchases found. </td></tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

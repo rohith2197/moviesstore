@@ -45,7 +45,7 @@ def purchase(request):
     order = Order()
     order.user = request.user
     order.total = cart_total
-    if request.POST['lat'] != '' and request.POST['lng'] != '':
+    if request.POST.get('lat', '') != '' and request.POST.get('lng', '') != '':
         order.region_id = str(int(float(request.POST['lat']))) + ',' + str(int(float(request.POST['lng'])))
     order.save()
     for movie in movies_in_cart:

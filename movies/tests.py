@@ -38,7 +38,7 @@ class MovieStatsViewTests(TestCase):
         self.client.login(username='member', password='memberpass123')
         for _ in range(times):
             self.client.post(f'/cart/{movie.id}/add/', {'quantity': '1'})
-            response = self.client.post('/cart/purchase/')
+            response = self.client.post('/cart/purchase/', {'lat': '33.77', 'lng': '-84.39'})
             self.assertEqual(response.status_code, 200)
         self.client.logout()
         self.client.login(username='admin_user', password='adminpass123')
@@ -84,7 +84,7 @@ class MovieStatsViewTests(TestCase):
         self.client.logout()
         self.client.login(username='member', password='memberpass123')
         self.client.post(f'/cart/{self.avatar.id}/add/', {'quantity': '3'})
-        self.client.post('/cart/purchase/')
+        self.client.post('/cart/purchase/', {'lat': '33.77', 'lng': '-84.39'})
 
         item = Item.objects.get(movie=self.avatar)
         self.assertEqual(item.quantity, 3)
