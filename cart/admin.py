@@ -11,7 +11,7 @@ class OrderAdmin(admin.ModelAdmin):
                       self.admin_site.admin_view(self.top_users_view),
                       name='cart_order_top_users'),
                  path('most-purchases/', 
-                      self.admin_site.admin_view(self.most_purchases),
+                      self.admin_site.admin_view(self.most_purchases_view),
                       name='cart_order_most_purchases'),
                 ] + super().get_urls()
 
@@ -34,13 +34,13 @@ class OrderAdmin(admin.ModelAdmin):
 
         return render(request, 'admin/top_users.html', context)
 
-    def most_purchases(self, request):
+    def most_purchases_view(self, request):
             user = User.objects.filter(
-                    is_staff=False, is_superuser=False
-                ).annotate(
-                        purchase_count=Sum('order__item__quantity')
-                ).filter(
-                    purchase_count__gt=0
+                 is_staff=False, is_superuser=False,
+                 ).annotate(
+                      purchase_count=Sum('order__item__quantity')
+                 ).filter(
+                      purchase_count__gt=0,
                 ).order_by('-purchase_count', 'username').first()
     
             context = {
