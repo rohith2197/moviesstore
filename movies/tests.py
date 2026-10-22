@@ -38,7 +38,7 @@ class MovieStatsViewTests(TestCase):
         self.client.login(username='member', password='memberpass123')
         for _ in range(times):
             self.client.post(f'/cart/{movie.id}/add/', {'quantity': '1'})
-            response = self.client.post('/cart/purchase/')
+            response = self.client.post('/cart/purchase/', {'lat': '33.77', 'lng': '-84.39'})
             self.assertEqual(response.status_code, 200)
         self.client.logout()
         self.client.login(username='admin_user', password='adminpass123')
@@ -84,7 +84,7 @@ class MovieStatsViewTests(TestCase):
         self.client.logout()
         self.client.login(username='member', password='memberpass123')
         self.client.post(f'/cart/{self.avatar.id}/add/', {'quantity': '3'})
-        self.client.post('/cart/purchase/')
+        self.client.post('/cart/purchase/', {'lat': '33.77', 'lng': '-84.39'})
 
         item = Item.objects.get(movie=self.avatar)
         self.assertEqual(item.quantity, 3)
@@ -99,3 +99,57 @@ class MovieStatsViewTests(TestCase):
         html = self._stats_html()
         self.assertIn('No movie has been bought yet.', html)
         self.assertIn('No movie has been reviewed yet.', html)
+
+
+class TopCommenterTests(TestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(
+            'testadmin', 'admin@exmaple.com', 'testpass123'
+        )
+        self.user_a = User.objects.create_user(
+            'user_a', password = 'testpass123'
+        )
+        self.user_b = User.objects.create_user(
+            'user_b', password = 'testpass123'
+        )
+        self.movie = Movie.objects.create(
+            name = 'Test Movie',
+            price = 10,
+            description = 'Test description'
+        )
+        self.url = '/admin/movies/movie/top-commenter/'
+    def add_comments(self, user, count):
+        for i in range(count):
+            Review.objects.create(
+                user = user,
+                movie = self.movie,
+                comment = f'Test comment {i}'
+            )
+    def test_admin_only(self):
+        self.client.force_login(self.user_a)
+        response = self.client.get(self.url)
+        self.assertNotEqual(response.status_code, 200)
+
+    def test_top_commenter(self):
+        self.add_comments(self.user_a, 2)
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['top_commenter']['user__username'], 'user_a')
+        self.assertEqual(response.context['top_commenter']['comment_count'], 2)
+        self.add_comments(self.user_b, 3)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['top_commenter']['user__username'], 'user_b')
+        self.assertEqual(response.context['top_commenter']['comment_count'], 3)
+
+    def test_no_comments(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'No comments have been posted yet.')
+
+
+        
