@@ -33,6 +33,20 @@ def stats_view(request):
         'most_reviewed': most_reviewed,
     })
 
+def top_commenter_view(request):
+    top_commenter = (
+        Review.objects
+        .values('user_id', 'user__username')
+        .annotate(comment_count=Count('id'))
+        .order_by('-comment_count', 'user__username', 'user_id')
+        .first()
+    )
+    context = {
+        **admin.site.each_context(request),
+        'title': 'Top Commenter',
+        'top_commenter': top_commenter,
+    }
+    return render(request, 'admin/top_commenter.html', context)
 
 class MovieAdmin(admin.ModelAdmin):
     ordering = ['name']
@@ -41,7 +55,10 @@ class MovieAdmin(admin.ModelAdmin):
     def get_urls(self):
         return [
             path('stats/', self.admin_site.admin_view(stats_view),
-                name='movies_movie_stats'),
+                name='movies_movie_stats',
+            ),
+            path(
+                'top-commenter/', self.admin_site.admin_view(top_commenter_view), name = 'movies_movie_top_commenter',),
         ] + super().get_urls()
 
 

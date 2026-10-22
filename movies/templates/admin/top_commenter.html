@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a> &rsaquo; Top Commenter
+</div>
+{% endblock %}
+{% block content %}
+<div id="content-main">
+    <p>
+        This page shows the user with the highest number of movie comments.
+    </p>
+
+    {% if top_commenter %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Comments Posted</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ top_commenter.user__username }}</td>
+                    <td>{{ top_commenter.comment_count }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <p>No comments have been posted yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
